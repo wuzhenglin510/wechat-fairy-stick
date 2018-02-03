@@ -2,6 +2,7 @@ const Tool = require('../../lib');
 const format = require('string-template');
 
 const URL = {
+    ACCESS_TOKEN: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}',
     LOGIN: 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&grant_type=authorization_code'
 };
 
@@ -15,6 +16,11 @@ module.exports = class {
 
     async login(code) {
         let url = format(URL.LOGIN, {appid: this.appid, secret: this.secret, js_code: code});
+        return await Tool.http.get(url);
+    }
+
+    async getAccessToken() {
+        let url = format(URL.ACCESS_TOKEN, {appid: this.appid, secret: this.secret});
         return await Tool.http.get(url);
     }
 
