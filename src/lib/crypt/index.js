@@ -25,14 +25,13 @@ function decryptUserInfo(encryptedData, iv, sessionKey, appid) {
         let decoded = decipher.update(encryptedData, 'binary', 'utf8');
         decoded += decipher.final('utf8');
         decoded = JSON.parse(decoded)
+        if (decoded && decoded.watermark.appid !== appid) {
+            throw new Error('bad man data')
+        }
+        return decoded;
     } catch (err) {
-        console.log(err)
-        throw new Error('Illegal Buffer')
+        throw new Error('Illegal Buffer');
     }
-    if (decoded && decoded.watermark.appid !== appid) {
-        throw new Error('Illegal Buffer')
-    }
-    return decoded;
 }
 
 async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, timestamp, nonce) {
