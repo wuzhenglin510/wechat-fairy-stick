@@ -32,10 +32,11 @@ module.exports = class {
 
 };
 
-async function decryptXMLToObj(expressRequest) {
+async function decryptXMLToObj(expressRequest, expressResponse) {
     let signature = expressRequest.query.msg_signature;
     let timestamp = expressRequest.query.timestamp;
     let nonce = expressRequest.query.nonce;
     let encryptString = expressRequest.body;
+    expressResponse.end('SUCCESS');
     return await Tool.crypt.decrypt(encryptString, signature, this.appid, this.encodingAESKey, this.token, timestamp, nonce);
 }
