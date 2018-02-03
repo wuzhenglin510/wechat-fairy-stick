@@ -1,7 +1,5 @@
 const crypto = require('crypto');
 const convert = require('xml2js').parseString;
-var mcrypt = require('mcrypt');
-
 
 module.exports = {
     decrypt: decrypt,
