@@ -14,12 +14,7 @@ function sha1(params) {
 }
 
 async function decrypt(xml, signature, appid, aesKey, token, timestamp, nonce) {
-    let obj = await new Promise((resovle, reject) => {
-        convert(xml, (err, result) => {
-            resovle(result);
-        });
-    });
-    let Encrypt = obj.xml.Encrypt[0];
+    let Encrypt = xml.xml.encrypt[0];
     //检查签名
     let sig = _signature(token, timestamp, nonce, Encrypt);
     if (sig != signature)
@@ -31,7 +26,6 @@ async function decrypt(xml, signature, appid, aesKey, token, timestamp, nonce) {
         });
     });
     return result;
-
 }
 
 function encrypt() {
