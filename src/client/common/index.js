@@ -1,4 +1,3 @@
-const Constant = require('../../constant');
 const Tool = require('../../lib');
 const format = require('string-template');
 
@@ -17,6 +16,10 @@ module.exports = class {
     async login(code) {
         let url = format(URL.LOGIN, {appid: this.appid, secret: this.secret, js_code: code});
         return await Tool.http.get(url);
+    }
+
+    decryptUserInfo(encryptedData, iv, sessionKey) {
+        return Tool.crypt.decryptUserInfo(encryptedData, iv, sessionKey);
     }
 
 };

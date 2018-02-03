@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const convert = require('xml2js').parseString;
 
 module.exports = {
-    decrypt: decrypt,
+    decryptXMLCustomMsgPush: decryptXMLCustomMsgPush,
+    decryptUserInfo: decryptUserInfo,
     sha1: sha1,
 };
 
@@ -13,13 +14,30 @@ function sha1(params) {
     return sha1.digest('hex');
 }
 
-async function decrypt(xml, signature, appid, aesKey, token, timestamp, nonce) {
+function decryptUserInfo(encryptedData, iv, sessionKey) {
+    sessionKey = new Buffer(sessionKey, 'base64');
+    encryptedData = new Buffer(encryptedData, 'base64');
+    iv = new Buffer(iv, 'base64');
+    let decode;
+    try {
+        const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
+        decipher.setAutoPadding(true);
+        decode = decipher.update(encryptedData, 'binary', 'utf8');
+        decode += decipher.final('utf8');
+        decode = JSON.parse(decode)
+    } catch (err) {
+        return null;
+    }
+    return decode;
+}
+
+async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, timestamp, nonce) {
     let Encrypt = xml.xml.encrypt[0];
     //检查签名
-    let sig = _signature(token, timestamp, nonce, Encrypt);
+    let sig = _signatureXMLCustomMsgPush(token, timestamp, nonce, Encrypt);
     if (sig != signature)
         throw new Error(`our signature: ${sig}, their signature: ${signature}`);
-    let decryptedMessage = _decrypt(Encrypt, aesKey, appid);
+    let decryptedMessage = _decryptXMLCustomMsgPush(Encrypt, aesKey, appid);
     let result = await new Promise((resolve, reject) => {
         convert(decryptedMessage, (err, result) => {
             resolve(restructure(result));
@@ -32,14 +50,14 @@ function encrypt() {
 
 }
 
-function _signature(token, timestamp, nonce, encrypt) {
+function _signatureXMLCustomMsgPush(token, timestamp, nonce, encrypt) {
     let signature = [token, timestamp, nonce, encrypt].sort().join('');
     let sha1 = crypto.createHash('sha1');
     sha1.update(signature);
     return sha1.digest('hex');
 }
 
-function _decrypt(str, aesKey, ourAppId) {
+function _decryptXMLCustomMsgPush(str, aesKey, ourAppId) {
     aesKey = new Buffer(aesKey + '=', 'base64');
     let iv = aesKey.slice(0, 16);
     let aesCipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
