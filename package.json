@@ -1,0 +1,26 @@
+{
+  "name": "wechat-fairy-stick",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wuzhenglin510/wechat-fairy-stick.git"
+  },
+  "author": "leo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wuzhenglin510/wechat-fairy-stick/issues"
+  },
+  "homepage": "https://github.com/wuzhenglin510/wechat-fairy-stick#readme",
+  "dependencies": {
+    "mocha": "^5.0.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "string-template": "^1.0.0",
+    "xml2js": "^0.4.19"
+  }
+}
