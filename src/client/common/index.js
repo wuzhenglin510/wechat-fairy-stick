@@ -19,7 +19,7 @@ module.exports = class {
     }
 
     decryptUserInfo(encryptedData, iv, sessionKey) {
-        return Tool.crypt.decryptUserInfo(encryptedData, iv, sessionKey);
+        return Tool.crypt.decryptUserInfo(encryptedData, iv, sessionKey, this.appid);
     }
 
 };

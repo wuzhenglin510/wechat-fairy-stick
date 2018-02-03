@@ -14,21 +14,25 @@ function sha1(params) {
     return sha1.digest('hex');
 }
 
-function decryptUserInfo(encryptedData, iv, sessionKey) {
+function decryptUserInfo(encryptedData, iv, sessionKey, appid) {
     sessionKey = new Buffer(sessionKey, 'base64');
     encryptedData = new Buffer(encryptedData, 'base64');
     iv = new Buffer(iv, 'base64');
-    let decode;
+    let decoded;
     try {
-        const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
+        let decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
         decipher.setAutoPadding(true);
-        decode = decipher.update(encryptedData, 'binary', 'utf8');
-        decode += decipher.final('utf8');
-        decode = JSON.parse(decode)
+        let decoded = decipher.update(encryptedData, 'binary', 'utf8');
+        decoded += decipher.final('utf8');
+        decoded = JSON.parse(decoded)
     } catch (err) {
-        return null;
+        console.log(err)
+        throw new Error('Illegal Buffer')
     }
-    return decode;
+    if (decoded && decoded.watermark.appid !== appid) {
+        throw new Error('Illegal Buffer')
+    }
+    return decoded;
 }
 
 async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, timestamp, nonce) {
