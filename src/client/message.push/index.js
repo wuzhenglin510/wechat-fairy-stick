@@ -37,5 +37,5 @@ async function decryptXMLToObj(expressRequest) {
     let timestamp = expressRequest.query.timestamp;
     let nonce = expressRequest.query.nonce;
     let encryptString = expressRequest.body;
-    return Tool.crypt.decrypt(encryptString, signature, this.appid, this.aesKey, this.token, timestamp, nonce);
+    return await Tool.crypt.decrypt(encryptString, signature, this.appid, this.encodingAESKey, this.token, timestamp, nonce);
 }
