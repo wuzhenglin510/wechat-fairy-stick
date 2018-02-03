@@ -17,6 +17,19 @@ module.exports = class {
         }
     }
 
+
+    async confirmConfig(expressRequest, expressResponse) {
+        let signature = expressRequest.query.signature;
+        let timestamp = expressRequest.query.timestamp;
+        let nonce = expressRequest.query.nonce;
+        let ourSign = Tool.crypt.sha1([this.token, timestamp, nonce]);
+        if( ourSign == signature ){
+            expressResponse.end(expressRequest.query.echostr);
+        }else{
+            expressResponse.end('failure');
+        }
+    }
+
 };
 
 async function decryptXMLToObj(expressRequest) {

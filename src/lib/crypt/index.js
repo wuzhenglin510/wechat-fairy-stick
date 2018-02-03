@@ -5,7 +5,15 @@ var mcrypt = require('mcrypt');
 
 module.exports = {
     decrypt: decrypt,
+    sha1: sha1,
 };
+
+function sha1(params) {
+    let material = params.sort().join('');
+    let sha1 = crypto.createHash('sha1');
+    sha1.update(material);
+    return sha1.digest('hex');
+}
 
 async function decrypt(xml, signature, appid, aesKey, token, timestamp, nonce) {
     let obj = await new Promise((resovle, reject) => {
