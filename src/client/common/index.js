@@ -3,7 +3,10 @@ const format = require('string-template');
 
 const URL = {
     ACCESS_TOKEN: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}',
-    LOGIN: 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&grant_type=authorization_code'
+    LOGIN: 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&grant_type=authorization_code',
+    QRCODE: {
+        UNLIMIT: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={access_token}'
+    }
 };
 
 module.exports = class {
@@ -26,6 +29,11 @@ module.exports = class {
 
     decryptUserInfo(encryptedData, iv, sessionKey) {
         return Tool.crypt.decryptUserInfo(encryptedData, iv, sessionKey, this.appid);
+    }
+
+    async getUnlimitQRCode(accessToken, param) {
+        let url = format(URL.QRCODE.UNLIMIT, {access_token: accessToken});
+        return await Tool.http.postJsonGetBuffer(url, param)
     }
 
 };
