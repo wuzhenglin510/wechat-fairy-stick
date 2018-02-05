@@ -7,7 +7,8 @@ const URL = {
     QRCODE: {
         UNLIMIT: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={access_token}'
     },
-    TEMPLATE_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={access_token}'
+    TEMPLATE_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={access_token}',
+    CUSTOM_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}'
 };
 
 module.exports = class {
@@ -37,21 +38,13 @@ module.exports = class {
         return await Tool.http.postJsonGetBuffer(url, param)
     }
 
-    async sendTemplateMessage(accessToken, openid, templateId, formId, data={}, emphasisKeyword=undefined, page=undefined, color=undefined) {
+    async sendTemplateMessage(accessToken, param) {
         let url = format(URL.TEMPLATE_MESSAGE, {access_token: accessToken});
-        let param = {
-            touser: openid,
-            template_id: templateId,
-            form_id: formId,
-            data: data
-        };
-        if (emphasisKeyword)
-            param.emphasis_keyword = emphasisKeyword;
-        if (page)
-            param.page = page;
-        if (color)
-            param.color = color;
         return await Tool.http.postJson(url, param);
     }
 
+    async sendCustomMessage(accessToken, param) {
+        let url = format(URL.CUSTOM_MESSAGE, {access_token: accessToken});
+        return await Tool.http.postJson(url, param);
+    }
 };
