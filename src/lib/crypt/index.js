@@ -18,7 +18,6 @@ function decryptUserInfo(encryptedData, iv, sessionKey, appid) {
     sessionKey = new Buffer(sessionKey, 'base64');
     encryptedData = new Buffer(encryptedData, 'base64');
     iv = new Buffer(iv, 'base64');
-    let decoded;
     try {
         let decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
         decipher.setAutoPadding(true);
@@ -64,7 +63,7 @@ function _decryptXMLCustomMsgPush(str, aesKey, ourAppId) {
     aesKey = new Buffer(aesKey + '=', 'base64');
     let iv = aesKey.slice(0, 16);
     let aesCipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
-    aesCipher.setAutoPadding(true);
+    aesCipher.setAutoPadding(false);
     let decipheredBuff = Buffer.concat([aesCipher.update(str, 'base64'), aesCipher.final()]);
     decipheredBuff = _PKCS7Decoder(decipheredBuff);
     let lenNetOrderCorpid = decipheredBuff.slice(16);
