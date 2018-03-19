@@ -5,10 +5,12 @@ const URL = {
     ACCESS_TOKEN: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}',
     LOGIN: 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&grant_type=authorization_code',
     QRCODE: {
+        ATYPE: 'https://api.weixin.qq.com/wxa/getwxacode?access_token={access_token}',
         UNLIMIT: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={access_token}'
     },
     TEMPLATE_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={access_token}',
-    CUSTOM_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}'
+    CUSTOM_MESSAGE: 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}',
+    USER_INFO: 'https://api.weixin.qq.com/cgi-bin/user/info?access_token={access_token}&openid={openid}&lang=zh_CN'
 };
 
 module.exports = class {
@@ -38,6 +40,11 @@ module.exports = class {
         return await Tool.http.postJsonGetBuffer(url, param)
     }
 
+    async getATypeQRCode(accessToken, param) {
+        let url = format(URL.QRCODE.ATYPE, {access_token: accessToken});
+        return await Tool.http.postJsonGetBuffer(url, param)
+    }
+
     async sendTemplateMessage(accessToken, param) {
         let url = format(URL.TEMPLATE_MESSAGE, {access_token: accessToken});
         return await Tool.http.postJson(url, param);
@@ -46,5 +53,10 @@ module.exports = class {
     async sendCustomMessage(accessToken, param) {
         let url = format(URL.CUSTOM_MESSAGE, {access_token: accessToken});
         return await Tool.http.postJson(url, param);
+    }
+
+    async getUserInfo(accessToken, openId) {
+        let url = format(URL.USER_INFO, {access_token: accessToken, openid: openId});
+        return await Tool.http.get(url);
     }
 };
