@@ -1,5 +1,6 @@
 const Constant = require('../../constant');
 const Tool = require('../../lib');
+const ejs = require('ejs');
 
 module.exports = class {
 
