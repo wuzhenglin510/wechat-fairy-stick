@@ -5,7 +5,8 @@ module.exports = {
     decryptXMLCustomMsgPush: decryptXMLCustomMsgPush,
     decryptUserInfo: decryptUserInfo,
     sha1: sha1,
-    encrypt: encrypt
+    encrypt: encrypt,
+    signature: signatureFunc
 };
 
 function encrypt(text, appId, aesKey) {
@@ -17,7 +18,7 @@ function encrypt(text, appId, aesKey) {
     msgLength.writeUInt32BE(msg.length, 0);
     let id = new Buffer(appId);
     let bufMsg = Buffer.concat([randomString, msgLength, msg, id]);
-    let encoded = PKCS7Encoder.encode(bufMsg);
+    let encoded = _PKCS7Encoder(bufMsg);
     let cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
     cipher.setAutoPadding(false);
     var cipheredMsg = Buffer.concat([cipher.update(encoded), cipher.final()]);
@@ -53,7 +54,7 @@ function decryptUserInfo(encryptedData, iv, sessionKey, appid) {
 async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, timestamp, nonce) {
     let Encrypt = xml.xml.encrypt[0];
     //检查签名
-    let sig = _signatureXMLCustomMsgPush(token, timestamp, nonce, Encrypt);
+    let sig = signatureFunc(token, timestamp, nonce, Encrypt);
     if (sig != signature)
         throw new Error(`our signature: ${sig}, their signature: ${signature}`);
     let decryptedMessage = _decryptXMLCustomMsgPush(Encrypt, aesKey, appid);
@@ -67,7 +68,7 @@ async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, tim
 
 
 
-function _signatureXMLCustomMsgPush(token, timestamp, nonce, encrypt) {
+function signatureFunc(token, timestamp, nonce, encrypt) {
     let signature = [token, timestamp, nonce, encrypt].sort().join('');
     let sha1 = crypto.createHash('sha1');
     sha1.update(signature);
@@ -89,6 +90,15 @@ function _decryptXMLCustomMsgPush(str, aesKey, ourAppId) {
         throw new Error('appId is invalid');
     }
     return result;
+}
+
+function _PKCS7Encoder(text) {
+    let blockSize = 32;
+    let textLength = text.length;
+    let amountToPad = blockSize - (textLength % blockSize);
+    let result = new Buffer(amountToPad);
+    result.fill(amountToPad);
+    return Buffer.concat([text, result]);
 }
 
 function _PKCS7Decoder(buff) {
