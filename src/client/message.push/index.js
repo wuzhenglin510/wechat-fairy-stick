@@ -31,7 +31,7 @@ module.exports = class {
         }
     }
 
-    async encrypt(replyMsg) {
+    encrypt(replyMsg) {
         let wrap = {}
         wrap.encrypt = Tool.crypt.encrypt(replyMsg, this.appid, this.encodingAESKey);
         wrap.nonce = parseInt((Math.random() * 100000000000), 10);
