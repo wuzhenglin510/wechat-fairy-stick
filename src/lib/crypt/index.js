@@ -5,7 +5,24 @@ module.exports = {
     decryptXMLCustomMsgPush: decryptXMLCustomMsgPush,
     decryptUserInfo: decryptUserInfo,
     sha1: sha1,
+    encrypt: encrypt
 };
+
+function encrypt(text, appId, aesKey) {
+    let randomString = crypto.pseudoRandomBytes(16);
+    aesKey = new Buffer(aesKey + '=', 'base64');
+    let iv = aesKey.slice(0, 16);
+    let msg = new Buffer(text);
+    let msgLength = new Buffer(4);
+    msgLength.writeUInt32BE(msg.length, 0);
+    let id = new Buffer(appId);
+    let bufMsg = Buffer.concat([randomString, msgLength, msg, id]);
+    let encoded = PKCS7Encoder.encode(bufMsg);
+    let cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
+    cipher.setAutoPadding(false);
+    var cipheredMsg = Buffer.concat([cipher.update(encoded), cipher.final()]);
+    return cipheredMsg.toString('base64');
+}
 
 function sha1(params) {
     let material = params.sort().join('');
@@ -48,9 +65,7 @@ async function decryptXMLCustomMsgPush(xml, signature, appid, aesKey, token, tim
     return result;
 }
 
-function encrypt() {
 
-}
 
 function _signatureXMLCustomMsgPush(token, timestamp, nonce, encrypt) {
     let signature = [token, timestamp, nonce, encrypt].sort().join('');

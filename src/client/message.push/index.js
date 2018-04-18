@@ -31,8 +31,33 @@ module.exports = class {
         }
     }
 
+    async encrypt(replyMsg) {
+        let wrap = {}
+        wrap.encrypt = Tool.crypt.encrypt(replyMsg, this.appid, this.encodingAESKey);
+        wrap.nonce = parseInt((Math.random() * 100000000000), 10);
+        wrap.timestamp = new Date().getTime();
+        wrap.signature = Tool.crypt.signature(this.token, wrap.timestamp, wrap.nonce, wrap.encrypt);
+        let wrapTpl = '<xml>' +
+            '<Encrypt><![CDATA[<%-encrypt%>]]></Encrypt>' +
+            '<MsgSignature><![CDATA[<%-signature%>]]></MsgSignature>' +
+            '<TimeStamp><%-timestamp%></TimeStamp>' +
+            '<Nonce><![CDATA[<%-nonce%>]]></Nonce>' +
+            '</xml>';
+        let encryptWrap = ejs.compile(wrapTpl);
+        return encryptWrap(wrap);
+    }
+
 
 };
+
+function getRandomStr(len) {
+    let w = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let str = '';
+    while(len--) {
+        str += w[Math.floor(Math.random() * w.length)];
+    }
+    return str;
+}
 
 async function decryptXMLToObj(expressRequest, expressResponse) {
     let signature = expressRequest.query.msg_signature;
